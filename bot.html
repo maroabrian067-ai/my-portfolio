@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with Maroa's AI Representative | IT & Business Analyst</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .bot-page-container {
+            max-width: 900px;
+            width: 95%;
+            margin: 100px auto 40px auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bot-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            height: 720px;
+            overflow: hidden;
+        }
+
+        .bot-header {
+            padding: 1.2rem 1.5rem;
+            background: rgba(15, 23, 42, 0.6);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bot-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bot-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0284c7, #e11d48);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #fff;
+            position: relative;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background-color: #10b981;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            border: 2px solid var(--card-bg);
+        }
+
+        .bot-info h2 {
+            font-size: 1.15rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bot-badge {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .bot-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .bot-actions a {
+            font-size: 0.85rem;
+            padding: 8px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-color);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .bot-actions a:hover {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        /* Quick Suggestions */
+        .suggestions-bar {
+            padding: 10px 15px;
+            background: rgba(15, 23, 42, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .suggestions-bar::-webkit-scrollbar {
+            height: 4px;
+        }
+        .suggestions-bar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .suggestion-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .suggestion-btn:hover {
+            background: rgba(2, 132, 199, 0.25);
+            border-color: #38bdf8;
+            color: #38bdf8;
+        }
+
+        /* Messages Area */
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            max-width: 85%;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .msg-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0284c7, #e11d48);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .msg-bubble {
+            padding: 14px 18px;
+            border-radius: 14px;
+            font-size: 0.92rem;
+            line-height: 1.55;
+        }
+
+        .message.bot .msg-bubble {
+            background: #151f30;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #e2e8f0;
+            border-top-left-radius: 4px;
+        }
+
+        .message.user .msg-bubble {
+            background: #0284c7;
+            color: #ffffff;
+            border-top-right-radius: 4px;
+        }
+
+        .msg-bubble a {
+            color: #38bdf8;
+            text-decoration: underline;
+        }
+
+        .msg-bubble strong {
+            color: #ffffff;
+        }
+
+        /* Input Area */
+        .chat-input-area {
+            padding: 15px;
+            background: rgba(15, 23, 42, 0.7);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .chat-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 18px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(30, 41, 59, 0.8);
+            color: #ffffff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: #38bdf8;
+        }
+
+        .send-btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            background: #0284c7;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s;
+        }
+
+        .send-btn:hover {
+            background: #0369a1;
+        }
+
+        .footer-disclaimer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .bot-page-container {
+                margin-top: 80px;
+                width: 100%;
+                height: calc(100vh - 90px);
+            }
+            .bot-card {
+                border-radius: 0;
+                height: 100%;
+            }
+            .message {
+                max-width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="logo"><a href="index.html" style="color: inherit; text-decoration: none;">MB<span>.</span></a></div>
+        <nav>
+            <ul>
+                <li><a href="index.html#hero">Home</a></li>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#projects">Projects</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+                <li><a href="bot.html" style="color: #38bdf8; font-weight: 600;"><i class="fa-solid fa-robot"></i> AI Representative</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="bot-page-container">
+        <div class="bot-card">
+            
+            <!-- Bot Header -->
+            <div class="bot-header">
+                <div class="bot-profile">
+                    <div class="bot-avatar">
+                        MB
+                        <div class="status-dot"></div>
+                    </div>
+                    <div class="bot-info">
+                        <h2>Maroa Brian Robare <span class="bot-badge"><i class="fa-solid fa-sparkles"></i> AI Representative</span></h2>
+                        <p>IT & Business Analyst • Nairobi, Kenya</p>
+                    </div>
+                </div>
+                <div class="bot-actions">
+                    <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Back to Portfolio</a>
+                </div>
+            </div>
+
+            <!-- Quick Suggestions Bar -->
+            <div class="suggestions-bar">
+                <span style="font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; padding-right: 5px;">Try asking:</span>
+                <button class="suggestion-btn" onclick="sendPrompt('What is your professional background and core strengths?')">💼 Background & Summary</button>
+                <button class="suggestion-btn" onclick="sendPrompt('What are your technical and business analysis skills?')">🛠 Skills & Tech Stack</button>
+                <button class="suggestion-btn" onclick="sendPrompt('Tell me about your featured projects like Airbnb and Migori County.')">🚀 Featured Projects</button>
+                <button class="suggestion-btn" onclick="sendPrompt('Tell me about your BBIT degree from Mount Kenya University.')">🎓 Education</button>
+                <button class="suggestion-btn" onclick="sendPrompt('How can I schedule an interview or contact Brian directly?')">📅 Contact / Schedule</button>
+            </div>
+
+            <!-- Messages Window -->
+            <div class="chat-messages" id="chat-messages">
+                <div class="message bot">
+                    <div class="msg-avatar">MB</div>
+                    <div class="msg-bubble">
+                        Hello! I am <strong>Maroa Brian Robare's</strong> personal AI representative.<br><br>
+                        I'm here to assist recruiters, prospective clients, and collaborators while Brian is away. You can ask me anything about his:
+                        <ul style="margin: 8px 0 8px 20px;">
+                            <li><strong>Business Systems Analysis & Process Modeling</strong> (BPM, UML, SDLC)</li>
+                            <li><strong>Backend & Database Engineering</strong> (MySQL, Supabase, Relational DB Design)</li>
+                            <li><strong>Portfolio Projects</strong> (Airbnb Clone, Migori County Platform, Network Lab)</li>
+                            <li><strong>Education & Credentials</strong> (BBIT from Mount Kenya University)</li>
+                        </ul>
+                        You can also paste a <strong>job description</strong> to see how well Brian matches your requirements!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Form -->
+            <div class="chat-input-area">
+                <form class="chat-form" id="chat-form" onsubmit="handleFormSubmit(event)">
+                    <input 
+                        type="text" 
+                        id="chat-input" 
+                        class="chat-input" 
+                        placeholder="Type a question or paste a job description..." 
+                        autocomplete="off"
+                        required
+                    />
+                    <button type="submit" class="send-btn">
+                        <span>Send</span> <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+                <div class="footer-disclaimer">
+                    Direct inquiries: <a href="mailto:maroabrian067@gmail.com" style="color: #38bdf8;">maroabrian067@gmail.com</a> | +254 791 338 643 • Strictly verified with Maroa's CV
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+
+        const profileData = {
+            name: "Maroa Brian Robare",
+            title: "IT & Business Analyst",
+            location: "Nairobi, Kenya",
+            phone: "+254791338643",
+            email: "maroabrian067@gmail.com",
+            portfolio: "https://brian23-maker.github.io/Brian-1",
+            linkedin: "https://www.linkedin.com/in/brian-maroa-0519292ba",
+            github: "https://github.com/Brian23-maker/Brian-1",
+            summary: "Detail-oriented Business Information Technology (BBIT) graduate with expertise in business systems analysis, requirements gathering, and end-to-end process modeling. Skilled in bridging business strategy with technical architecture, utilizing structured analysis, UML modeling, and relational database design to optimize workflows and eliminate operational bottlenecks.",
+            education: "Bachelor of Business Information Technology (BBIT) | Mount Kenya University, Thika, Kenya (Sep 2022 – Dec 2025). Core Modules: Business Process Modeling, Software Engineering, Database Administration, Enterprise Systems, Information Security, Business Systems Analysis.\nKCSE: St. Joseph's School, Rapogi (Grade: B).",
+            experience: "Project Developer (Volunteer) at Migori County Government (May 2025 – Aug 2025):\n• Requirements & Workflow Mapping: Partnered with cross-functional IT and administrative teams to translate strategic goals into technical specifications.\n• Solution Architecture & Deployment: Analyzed, designed, and deployed a localized management platform, improving public engagement and workflow efficiency.\n• System Performance & Optimization: Conducted routine database maintenance, upgrades, and system checks.",
+            projects: [
+                {
+                    name: "Airbnb Booking Platform",
+                    desc: "A full-featured property booking and rental platform inspired by Airbnb. Features listing browsing, intuitive reservations, and booking management.",
+                    stack: "PHP, MySQL, JavaScript, HTML5, CSS3",
+                    link: "https://airbnbbooking.lovestoblog.com"
+                },
+                {
+                    name: "Local Government Management System",
+                    desc: "Localized cultural event and administrative system for Migori County Government to streamline public engagement and workflow efficiency.",
+                    stack: "PHP, MySQL, Systems Architecture"
+                },
+                {
+                    name: "Network Configuration & Security Lab",
+                    desc: "Designed and simulated a secure corporate enterprise network utilizing segmented subnets, LAN/WAN architecture, and firewall access control lists (ACLs).",
+                    stack: "Cisco Packet Tracer, Firewalls, Network Design"
+                }
+            ],
+            skills: {
+                ba: ["Requirements Gathering", "Business Process Modeling (BPM)", "Systems Development Life Cycle (SDLC)", "UML Diagrams", "Value Chain Mapping", "Business Systems Analysis & Design"],
+                db: ["Relational Database Design", "Enterprise Resource Planning (ERP)", "Data Normalization", "MySQL", "Supabase"],
+                tech: ["PHP", "JavaScript", "HTML5/CSS3", "Java", "C++", "LAN/WAN Configuration", "Firewall Protocols"]
+            }
+        };
+
+        function addMessage(sender, text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'msg-avatar';
+            avatar.textContent = sender === 'bot' ? 'MB' : 'You';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'msg-bubble';
+            bubble.innerHTML = text;
+
+            msgDiv.appendChild(avatar);
+            msgDiv.appendChild(bubble);
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function getBotReply(rawQuery) {
+            const q = rawQuery.toLowerCase();
+
+            // 1. Greetings
+            if (q.match(/\b(hi|hello|hey|greetings|morning|afternoon)\b/)) {
+                return `Hello! How can I assist you today? You can ask about Brian's experience as an IT & Business Analyst, his projects, technical competencies, or paste a role description to see if he's a match.`;
+            }
+
+            // 2. Contact / Interview / Schedule / Availability / Salary
+            if (q.includes('schedule') || q.includes('interview') || q.includes('call') || q.includes('salary') || q.includes('hire') || q.includes('rate') || q.includes('available')) {
+                if (q.includes('salary') || q.includes('rate')) {
+                    return `I don't have access to Maroa's exact salary expectations or compensation structures.<br><br>However, you can discuss compensation directly with him via:<br>• <strong>Email:</strong> <a href="mailto:${profileData.email}">${profileData.email}</a><br>• <strong>Phone:</strong> ${profileData.phone}`;
+                }
+                return `I have logged your request! Brian will get back to you as soon as he is available.<br><br>You can reach him directly at:<br>• <strong>Email:</strong> <a href="mailto:${profileData.email}">${profileData.email}</a><br>• <strong>Phone / WhatsApp:</strong> ${profileData.phone}<br>• <strong>LinkedIn:</strong> <a href="${profileData.linkedin}" target="_blank">linkedin.com/in/brian-maroa-0519292ba</a>`;
+            }
+
+            // 3. Projects
+            if (q.includes('project') || q.includes('airbnb') || q.includes('migori') || q.includes('cisco') || q.includes('network') || q.includes('portfolio')) {
+                return `Here are Brian's featured projects:<br><br>
+                1. <strong>Airbnb Booking Platform</strong><br>
+                A property booking platform with reservation management and responsive UI.<br>
+                • <em>Stack:</em> PHP, MySQL, JavaScript, HTML5, CSS3<br>
+                • <em>Live Demo:</em> <a href="https://airbnbbooking.lovestoblog.com" target="_blank">airbnbbooking.lovestoblog.com</a><br><br>
+                2. <strong>Local Government Management System (Migori County)</strong><br>
+                Designed and deployed localized platforms to optimize workflow and public engagement.<br>
+                • <em>Stack:</em> PHP, MySQL, Systems Architecture<br><br>
+                3. <strong>Network Configuration & Security Lab</strong><br>
+                Enterprise network design with subnets and firewall ACLs using Cisco Packet Tracer.<br><br>
+                View more on his portfolio: <a href="${profileData.portfolio}" target="_blank">brian23-maker.github.io/Brian-1</a>`;
+            }
+
+            // 4. Skills
+            if (q.includes('skill') || q.includes('tool') || q.includes('stack') || q.includes('sql') || q.includes('database') || q.includes('bpm') || q.includes('uml')) {
+                return `Here is an overview of Maroa Brian's core competencies:<br><br>
+                • <strong>Business Systems Analysis:</strong> Requirements Gathering, Business Process Modeling (BPM), Systems Development Life Cycle (SDLC), UML Diagrams, Value Chain Mapping.<br>
+                • <strong>Databases & Enterprise:</strong> Relational Database Design, Data Normalization, Enterprise Resource Planning (ERP), MySQL, Supabase.<br>
+                • <strong>Development & Systems:</strong> PHP, JavaScript, HTML5/CSS3, Java, C++, LAN/WAN Configuration, Firewall Protocols.`;
+            }
+
+            // 5. Education
+            if (q.includes('education') || q.includes('university') || q.includes('degree') || q.includes('mku') || q.includes('mount kenya') || q.includes('school') || q.includes('kcse')) {
+                return `<strong>Educational Background:</strong><br><br>
+                🎓 <strong>Bachelor of Business Information Technology (BBIT)</strong><br>
+                Mount Kenya University, Thika, Kenya (Sep 2022 – Dec 2025)<br>
+                <em>Core Modules:</em> Business Process Modeling, Software Engineering, Database Administration, Enterprise Systems, Information Security, Business Systems Analysis.<br><br>
+                🏫 <strong>Kenya Certificate of Secondary Education (KCSE)</strong><br>
+                St. Joseph's School, Rapogi, Awendo (Grade: B Plain)`;
+            }
+
+            // 6. Summary / Background
+            if (q.includes('summary') || q.includes('about') || q.includes('who is') || q.includes('background') || q.includes('bio')) {
+                return `<strong>Maroa Brian Robare</strong> is an <strong>IT & Business Analyst</strong> based in Nairobi, Kenya.<br><br>
+                ${profileData.summary}<br><br>
+                • <strong>Degree:</strong> BBIT (Mount Kenya University)<br>
+                • <strong>Specialization:</strong> Requirements Elicitation, Process Optimization, Full-Stack Web, and Relational Databases.<br>
+                • <strong>Live Portfolio:</strong> <a href="${profileData.portfolio}" target="_blank">${profileData.portfolio}</a>`;
+            }
+
+            // 7. Recruiter Job Evaluation Match (Default fallback)
+            return `Maroa Brian Robare is a verified <strong>IT & Business Analyst</strong> with a background in <strong>Business Information Technology (BBIT)</strong>.<br><br>
+            He brings hands-on capability in:<br>
+            • Translating strategic operational goals into technical specifications (BPM / UML)<br>
+            • Relational database architecture (MySQL, Supabase, Data Normalization)<br>
+            • Web application delivery (PHP, JavaScript, HTML5/CSS3)<br><br>
+            If your role requires these competencies, Brian would be glad to connect. Feel free to leave your contact details or email him directly at <a href="mailto:${profileData.email}">${profileData.email}</a>.`;
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            addMessage('user', text);
+            chatInput.value = '';
+
+            // Bot response with natural typing delay
+            setTimeout(() => {
+                const reply = getBotReply(text);
+                addMessage('bot', reply);
+            }, 350);
+        }
+
+        function sendPrompt(text) {
+            chatInput.value = text;
+            handleFormSubmit(new Event('submit'));
+        }
+    </script>
+</body>
+</html>
