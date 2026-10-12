@@ -279,9 +279,11 @@ footer {
         font-size: 2.5rem;
     }
     nav ul {
-        display: none; /* Simplification for brief code; can add a burger menu later */
+        display: none; 
     }
-}/* --- Hero Button Layout & Secondary Button --- */
+}
+
+/* --- Hero Button Layout & Secondary Button --- */
 .hero-buttons {
     display: flex;
     gap: 1.5rem;
